@@ -12,6 +12,7 @@
 #include <cli.h>
 #include <version.h>
 
+#undef is_boot_from_usb
 #ifdef is_boot_from_usb
 #include <environment.h>
 #endif
