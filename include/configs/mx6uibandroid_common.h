@@ -7,10 +7,21 @@
 #ifndef MX6_UIB_ANDROID_COMMON_H
 #define MX6_UIB_ANDROID_COMMON_H
 
-#define CONFIG_SERIAL_TAG
 
-#define CONFIG_USB_DEVICE
-#define CONFIG_IMX_UDC		       1
+
+/*#define CONFIG_USB_DEVICE*/
+
+#define CONFIG_USBD_HS
+#define CONFIG_CI_UDC
+#define CONFIG_USB_GADGET_DUALSPEED
+
+#define CONFIG_USB_GADGET
+#define CONFIG_CMD_USB_MASS_STORAGE
+#define CONFIG_USB_GADGET_MASS_STORAGE
+#define CONFIG_USBDOWNLOAD_GADGET
+#define CONFIG_USB_GADGET_VBUS_DRAW     2
+
+/*#define CONFIG_IMX_UDC		       1*/
 
 #define CONFIG_FASTBOOT		       1
 #define CONFIG_FASTBOOT_VENDOR_ID      0x18d1
@@ -22,6 +33,18 @@
 #define CONFIG_FASTBOOT_CONFIGURATION_STR  "Android fastboot"
 #define CONFIG_FASTBOOT_SERIAL_NUM	"12345"
 #define CONFIG_FASTBOOT_SATA_NO		 0
+
+#define CONFIG_CMD_FASTBOOT
+#define CONFIG_ANDROID_BOOT_IMAGE
+#define CONFIG_FSL_FASTBOOT
+#define CONFIG_FASTBOOT_FLASH
+
+#define CONFIG_G_DNL_VENDOR_NUM         0x18d1
+#define CONFIG_G_DNL_PRODUCT_NUM        0x0d02
+#define CONFIG_G_DNL_MANUFACTURER       "FSL"
+
+#define CONFIG_USBDOWNLOAD_GADGET
+
 
 #if defined CONFIG_SYS_BOOT_NAND
 #define CONFIG_FASTBOOT_STORAGE_NAND
@@ -36,35 +59,46 @@
 #define CONFIG_FASTBOOT_TRANSFER_BUF	0x2c000000
 #define CONFIG_FASTBOOT_TRANSFER_BUF_SIZE 0x19000000 /* 400M byte */
 
-
-#define CONFIG_CMD_BOOTI
-#define CONFIG_ANDROID_RECOVERY
-/* which mmc bus is your main storage ? */
 #define CONFIG_ANDROID_MAIN_MMC_BUS 2
 #define CONFIG_ANDROID_BOOT_PARTITION_MMC 1
 #define CONFIG_ANDROID_SYSTEM_PARTITION_MMC 5
 #define CONFIG_ANDROID_RECOVERY_PARTITION_MMC 2
 #define CONFIG_ANDROID_CACHE_PARTITION_MMC 6
+#define CONFIG_ANDROID_DATA_PARTITION_MMC 4
+
+
+#define CONFIG_CMD_BOOTA
+#define CONFIG_SUPPORT_RAW_INITRD
+#define CONFIG_SERIAL_TAG
+
+/*#define CONFIG_CMD_BOOTI*/
+#define CONFIG_ANDROID_RECOVERY
+/* which mmc bus is your main storage ? */
+/*#define CONFIG_ANDROID_MAIN_MMC_BUS 2
+#define CONFIG_ANDROID_BOOT_PARTITION_MMC 1
+#define CONFIG_ANDROID_SYSTEM_PARTITION_MMC 5
+#define CONFIG_ANDROID_RECOVERY_PARTITION_MMC 2
+#define CONFIG_ANDROID_CACHE_PARTITION_MMC 6*/
 
 #undef CONFIG_LOADADDR
 
-#define CONFIG_LOADADDR		0x10800000	/* loadaddr env var */
+#define CONFIG_LOADADDR		0x12000000 /*0x10800000*/	/* loadaddr env var */
 
 #undef CONFIG_EXTRA_ENV_SETTINGS
 #undef CONFIG_BOOTCOMMAND
 
 #define	CONFIG_EXTRA_ENV_SETTINGS											\
-		"bootargs_base=setenv bootargs console=ttymxc0,115200 init=/init "	\
+		"bootargs_base=setenv bootargs console=ttymxc0,115200 init=/init loglevel=8 "	\
 		"video=mxcfb0:dev=ldb,LDB-WSVGA,bpp=32,if=RGB24 ldb=sin0 "			\
 		"video=mxcfb1:off video=mxcfb2:off " CONFIG_SYS_NOSMP " "			\
 		"log_buf_len=64K vmalloc=400M androidboot.console=ttymxc0 "			\
 		"androidboot.hardware=freescale androidboot.serialno=0a01234567890abc\0" \
 		"bootcmd_sd=mmc dev 1;"												\
 		"setenv bootargs ${bootargs} androidboot.rootdevice=sd; " 			\
-		"booti mmc1 ${recovery}\0"											\
+		"boota mmc1 ${recovery}\0"											\
 		"bootcmd_emmc=mmc dev 0;"											\
 		"setenv bootargs ${bootargs} androidboot.rootdevice=emmc; " 		\
-		"booti mmc0 ${recovery}\0"											\
+		"boota mmc0 ${recovery}\0"											\
 		"bootcmd=setenv recovery; run bootuib\0"							\
 		"bootuib=run bootargs_base; "										\
 		"if test ${bootdev} = mmc1; "										\
@@ -72,7 +106,13 @@
 		"  else run bootcmd_emmc; fi\0"										\
 		"splashimage=0x30000000\0"											\
 		"splashpos=m,m\0"													\
+		"fdt_high=0xffffffff\0"	  \
+		"initrd_high=0xffffffff\0" \
 		"bootcmd_android_recovery=setenv recovery recovery;	run bootuib\0"	\
+
+
+#define CONFIG_USB_FASTBOOT_BUF_ADDR   CONFIG_SYS_LOAD_ADDR
+#define CONFIG_USB_FASTBOOT_BUF_SIZE   0x19000000
 
 #if defined(CONFIG_FASTBOOT_STORAGE_NAND)
 #define ANDROID_FASTBOOT_NAND_PARTS "16m@64m(boot) 16m@80m(recovery) 810m@96m(android_root)ubifs"

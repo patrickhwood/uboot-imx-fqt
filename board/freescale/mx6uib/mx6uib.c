@@ -437,12 +437,12 @@ int board_mmc_init(bd_t *bis)
 		case 0:
 			imx_iomux_v3_setup_multiple_pads(
 				usdhc3_pads, ARRAY_SIZE(usdhc3_pads));
-			usdhc_cfg[1].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
+			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC3_CLK);
 			break;
 		case 1:
 			imx_iomux_v3_setup_multiple_pads(
 				usdhc2_pads, ARRAY_SIZE(usdhc2_pads));
-			usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
+			usdhc_cfg[i].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
 			break;
 		default:
 			printf("Warning: you configured more USDHC controllers"
@@ -1062,7 +1062,9 @@ static const struct boot_mode board_boot_modes[] = {
 
 int board_late_init(void)
 {
+	printf("ambika: before calling find_mmc_device");
 	struct mmc *mmc = find_mmc_device(1);
+	printf("ambika: after calling find_mmc_device");
 	int bootdev = get_boot_device();
 	uint soc_sbmr2 = readl(SRC_BASE_ADDR + 0x1C);
 

@@ -12,13 +12,20 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/imx-common/gpio.h>
 
+#ifdef CONFIG_SPL
+#define CONFIG_SPL_LIBCOMMON_SUPPORT
+#define CONFIG_SPL_MMC_SUPPORT
+#include "imx6_spl.h"
+#endif
+
 #define CONFIG_MACH_TYPE	3980
 #define CONFIG_MXC_UART_BASE	UART1_BASE
 #define CONFIG_CONSOLE_DEV		"ttymxc0"
 #define CONFIG_MMCROOT			"/dev/mmcblk0p2"  /* SDHC3 */
 #define CONFIG_MX6DL 1
-#define CONFIG_DEFAULT_FDT_FILE "imx6dl-sabresd.dtb"
+#define CONFIG_DEFAULT_FDT_FILE "imx6dl-uib.dtb"
 #define	CONFIG_DDR_MB 2048
+#define PHYS_SDRAM_SIZE		(2u * 1024 * 1024 * 1024)
 #define CONFIG_SYS_NOSMP ""
 #define CONFIG_ANDROID_SUPPORT 1
 
@@ -35,6 +42,12 @@
 #define CONFIG_USB_MAX_CONTROLLER_COUNT 1 /* Enabled USB controller number */
 
 #define CONFIG_SYS_FSL_USDHC_NUM	2
+#define CONFIG_SYS_MMC_ENV_DEV      0  
+
+
+#ifdef CONFIG_SYS_USE_SPINOR
+#define CONFIG_SF_DEFAULT_CS   0
+#endif
 
 /*
  * imx6 q/dl/solo pcie would be failed to work properly in kernel, if

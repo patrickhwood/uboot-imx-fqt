@@ -21,6 +21,12 @@
 /* uncomment for SECURE mode support */
 /* #define CONFIG_SECURE_BOOT */
 
+#ifdef CONFIG_SECURE_BOOT
+#ifndef CONFIG_CSF_SIZE
+#define CONFIG_CSF_SIZE 0x4000
+#endif
+#endif
+
 #include "mx6_common.h"
 #include <linux/sizes.h>
 
@@ -45,6 +51,10 @@
 
 #define CONFIG_MXC_UART
 
+#define CONFIG_USB_FASTBOOT_BUF_ADDR   CONFIG_SYS_LOAD_ADDR
+#define CONFIG_USB_FASTBOOT_BUF_SIZE   0x19000000
+
+
 #define CONFIG_CMD_FUSE
 #ifdef CONFIG_CMD_FUSE
 #define CONFIG_MXC_OCOTP
@@ -60,6 +70,8 @@
 #define CONFIG_GENERIC_MMC
 #define CONFIG_BOUNCE_BUFFER
 #define CONFIG_CMD_EXT2
+#define CONFIG_CMD_EXT4
+#define CONFIG_CMD_EXT4_WRITE
 #define CONFIG_CMD_FAT
 #define CONFIG_DOS_PARTITION
 
@@ -96,6 +108,7 @@
 	"mfgtool_args=setenv bootargs console=" CONFIG_CONSOLE_DEV ",115200 " \
 		"rdinit=/linuxrc " \
 		"g_mass_storage.stall=0 g_mass_storage.removable=1 " \
+		"g_mass_storage.file=/fat g_mass_storage.ro=1 " \
 		"g_mass_storage.idVendor=0x066F g_mass_storage.idProduct=0x37FF "\
 		"g_mass_storage.iSerialNumber=\"\" "\
 		"enable_wait_mode=off "\

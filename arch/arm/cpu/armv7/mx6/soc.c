@@ -805,7 +805,8 @@ static int ldo_bypass;
 int check_ldo_bypass(void)
 {
 	const int *ldo_mode;
-	int node;
+	int node, root_node;
+	const char * model;
 
 	/* get the right fdt_blob from the global working_fdt */
 	gd->fdt_blob = working_fdt;
@@ -817,6 +818,13 @@ int check_ldo_bypass(void)
 		return 0;
 	}
 	ldo_mode = fdt_getprop(gd->fdt_blob, node, "fsl,ldo-bypass", NULL);
+
+	root_node = fdt_path_offset(gd->fdt_blob, "/");
+        if (!(root_node < 0)) {
+        model = fdt_getprop(gd->fdt_blob, root_node, "model", NULL);
+	printf("\nmodel name = % s", model);
+	}
+
 	/*
 	 * return 1 if "fsl,ldo-bypass = <1>", else return 0 if
 	 * "fsl,ldo-bypass = <0>" or no "fsl,ldo-bypass" property

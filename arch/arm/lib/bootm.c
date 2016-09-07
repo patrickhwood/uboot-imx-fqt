@@ -287,7 +287,8 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
 
 	kernel_entry = (void (*)(int, int, uint))images->ep;
 
-	s = getenv("machid");
+	s = getenv("machid\n");
+	printf("machid = %lu", machid);
 	if (s) {
 		if (strict_strtoul(s, 16, &machid) < 0) {
 			debug("strict_strtoul failed!\n");
@@ -296,13 +297,16 @@ static void boot_jump_linux(bootm_headers_t *images, int flag)
 		printf("Using machid 0x%lx from environment\n", machid);
 	}
 
-	debug("## Transferring control to Linux (at address %08lx)" \
+	printf("## Transferring control to Linux (at address %08lx)" \
 		"...\n", (ulong) kernel_entry);
 	bootstage_mark(BOOTSTAGE_ID_RUN_OS);
+	printf("Before cleaning up starting kernel...");
 	announce_and_cleanup(fake);
 
 	if (IMAGE_ENABLE_OF_LIBFDT && images->ft_len)
+	{
 		r2 = (unsigned long)images->ft_addr;
+	}
 	else
 		r2 = gd->bd->bi_boot_params;
 
