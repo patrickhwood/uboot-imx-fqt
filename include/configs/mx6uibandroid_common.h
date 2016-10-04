@@ -7,7 +7,7 @@
 #ifndef MX6_UIB_ANDROID_COMMON_H
 #define MX6_UIB_ANDROID_COMMON_H
 
-
+#define CONFIG_MX6DL_UIB_REV_2
 
 /*#define CONFIG_USB_DEVICE*/
 
@@ -92,7 +92,7 @@
 		"video=mxcfb0:dev=ldb,LDB-WSVGA,bpp=32,if=RGB24 ldb=sin0 "			\
 		"video=mxcfb1:off video=mxcfb2:off " CONFIG_SYS_NOSMP " "			\
 		"log_buf_len=64K vmalloc=400M androidboot.console=ttymxc0 "			\
-		"androidboot.hardware=freescale androidboot.serialno=0a01234567890abc\0" \
+		"androidboot.hardware=freescale androidboot.selinux=permissive androidboot.serialno=0a01234567890abc\0" \
 		"bootcmd_sd=mmc dev 1;"												\
 		"setenv bootargs ${bootargs} androidboot.rootdevice=sd; " 			\
 		"boota mmc1 ${recovery}\0"											\

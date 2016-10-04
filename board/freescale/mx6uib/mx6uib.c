@@ -55,7 +55,12 @@ DECLARE_GLOBAL_DATA_PTR;
 #define LCD_RESET IMX_GPIO_NR(3, 27)
 #define RECOVERY_BOOT_LATCH IMX_GPIO_NR(3, 16)
 
+
 #define EXT_LED0 IMX_GPIO_NR(1, 2)
+
+#define S3_PWR_MODE IMX_GPIO_NR(4, 14)
+static int board_version = 2;
+
 //#define EXT_LED1 IMX_GPIO_NR(1, 5)
 //#define EXT_LED2 IMX_GPIO_NR(1, 7)
 //#define EXT_LED3 IMX_GPIO_NR(1, 8)
@@ -809,7 +814,46 @@ static void do_enable_hdmi(struct display_info_t const *dev)
 }
 #endif // CONFIG_IMX_HDMI
 
+static void enable_lvds(struct display_info_t const *dev)
+{
+        struct iomuxc *iomux = (struct iomuxc *)
+                                IOMUXC_BASE_ADDR;
+        u32 reg = readl(&iomux->gpr[2]);
+        reg |= IOMUXC_GPR2_DATA_WIDTH_CH0_18BIT |
+               IOMUXC_GPR2_DATA_WIDTH_CH1_18BIT;
+        writel(reg, &iomux->gpr[2]);
+}
+
+static int detect_i2c(struct display_info_t const *dev)
+{
+        return (0 == i2c_set_bus_num(dev->bus)) &&
+                (0 == i2c_probe(dev->addr));
+}
+
+
 static struct display_info_t const displays[] = {
+{
+        .bus    = -1,
+        .addr   = 0,
+        .pixfmt = IPU_PIX_FMT_RGB666,
+        .detect = NULL,
+        .enable = enable_lvds,
+        .mode   = {
+                .name           = "WSVGA",
+                .refresh        = 60,
+                .xres           = 1024,
+                .yres           = 600,
+                .pixclock       = 19531,
+                .left_margin    = 80,
+                .right_margin   = 80,
+                .upper_margin   = 6,
+                .lower_margin   = 6,
+                .hsync_len      = 160,
+                .vsync_len      = 23,
+                .sync           = FB_SYNC_EXT | FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+                .vmode          = FB_VMODE_NONINTERLACED
+        }
+},
 {
 	.bus	= -1,
 	.addr	= 0,
@@ -889,7 +933,7 @@ int board_video_skip(void)
 		if (!ret) {
 			if (displays[i].enable)
 				displays[i].enable(displays+i);
-			printf("Display: %s (%ux%u)\n",
+			printf("Ambika Display: %s (%ux%u)\n",
 			       displays[i].mode.name,
 			       displays[i].mode.xres,
 			       displays[i].mode.yres);
@@ -993,6 +1037,7 @@ int board_init(void)
 {
 	/* address of boot parameters */
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
+        u32 s3_state;
 
 #if defined(CONFIG_VIDEO_IPUV3)
 	setup_display();
@@ -1016,9 +1061,38 @@ int board_init(void)
 	gpio_direction_output(LCD_PWR_EN, 1);
 	gpio_direction_output(LCD_STBYB, 1);
 	/* toggle LCD RESET line */
-	gpio_direction_output(LCD_RESET, 0);
+	/*gpio_direction_output(LCD_RESET, 0);
 	udelay(1000);
-	gpio_set_value(LCD_RESET, 1);
+	gpio_set_value(LCD_RESET, 1);*/
+
+	/* Ambika Copied  from latest Uboot for kitkat **/
+
+	/* detect board version by toggling S3 via LED0 */
+        imx_iomux_v3_setup_pad(MX6_PAD_KEY_COL4__GPIO4_IO14 |  MUX_PAD_CTRL(NO_PAD_CTRL));
+        udelay(1000);
+        s3_state = gpio_get_value(S3_PWR_MODE);
+        gpio_set_value(EXT_LED0, 1);
+        udelay(1000);
+
+        gpio_direction_output(LCD_PWR_EN, board_version == 1 ? 0 : 1);
+        gpio_direction_output(LCD_STBYB, 0);
+        udelay(100000);
+        gpio_set_value(LCD_PWR_EN, board_version == 1 ? 1 : 0);
+        gpio_set_value(LCD_STBYB, 1);
+
+        // delay for 36 msec at POR per Ilitek spec (try 50 -- udelay isn't that accurate)
+        udelay(50000);
+
+        gpio_direction_output(LCD_RESET, 1);
+
+        // default board version is 2, so only set version to 1 if
+        // fiery is not suspended *and* we can't toggle S3 via LED0
+        if (s3_state == 0 && gpio_get_value(S3_PWR_MODE) == 0)
+                board_version = 1;
+        gpio_set_value(EXT_LED0, 0);
+
+
+	/* Ambika Copied  from latest Uboot for kitkat **/
 
 	/* PWM backlight */
 	imx_iomux_v3_setup_pad(MX6_PAD_GPIO_9__GPIO1_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL));
