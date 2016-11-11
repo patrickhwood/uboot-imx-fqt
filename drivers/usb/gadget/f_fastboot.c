@@ -169,8 +169,8 @@ static unsigned int download_bytes_unpadded;
 static struct cmd_fastboot_interface interface = {
 	.rx_handler            = NULL,
 	.reset_handler         = NULL,
-	.product_name          = NULL,
-	.serial_no             = NULL,
+	.product_name          = CONFIG_FASTBOOT_PRODUCT_NAME_STR,
+	.serial_no             = CONFIG_FASTBOOT_SERIAL_NUM,
 	.nand_block_size       = 0,
 	.transfer_buffer       = (unsigned char *)0xffffffff,
 	.transfer_buffer_size  = 0,
@@ -2039,7 +2039,10 @@ static void cb_getvar(struct usb_ep *ep, struct usb_request *req)
 
 	if (!strcmp_l1("version", cmd)) {
 		strncat(response, FASTBOOT_VERSION, chars_left);
-	} else if (!strcmp_l1("bootloader-version", cmd)) {
+	}
+	else if (!strcmp_l1("product", cmd)) {
+                strncat(response, CONFIG_FASTBOOT_PRODUCT_NAME_STR, chars_left);
+        } else if (!strcmp_l1("bootloader-version", cmd)) {
 		strncat(response, U_BOOT_VERSION, chars_left);
 	} else if (!strcmp_l1("downloadsize", cmd) ||
 		!strcmp_l1("max-download-size", cmd)) {
@@ -2048,6 +2051,7 @@ static void cb_getvar(struct usb_ep *ep, struct usb_request *req)
 		sprintf(str_num, "0x%08x", CONFIG_USB_FASTBOOT_BUF_SIZE);
 		strncat(response, str_num, chars_left);
 	} else if (!strcmp_l1("serialno", cmd)) {
+		printf("Ambika: Trying to get serial number \n");
 		s = getenv("serial#");
 		if (s)
 			strncat(response, s, chars_left);

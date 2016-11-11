@@ -108,6 +108,7 @@
 		"splashpos=m,m\0"													\
 		"fdt_high=0xffffffff\0"	  \
 		"initrd_high=0xffffffff\0" \
+		"serial#=12345\0" \
 		"bootcmd_android_recovery=setenv recovery recovery;	run bootuib\0"	\
 
 
