@@ -10,11 +10,13 @@
 #include <common.h>
 #include <command.h>
 #include <g_dnl.h>
-
+void *video_logo(int);
 static int do_fastboot(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 {
 	int ret;
 
+	//printf("Ambika: Fastboot mode called do_fastboot()\n");
+	video_logo(1);
 	g_dnl_clear_detach();
 	ret = g_dnl_register("usb_dnl_fastboot");
 	if (ret)

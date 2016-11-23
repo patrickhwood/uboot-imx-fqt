@@ -512,6 +512,7 @@ int splash_screen_prepare(void)
 	uint blk_start, blk_cnt, n;
 
 	s = getenv("splashimage");
+	printf("Ambika: preparing splash image CONFIG_SPLASH_IS_IN_MMC");
 
 	if (NULL == s) {
 		puts("env splashimage not found!\n");
@@ -772,6 +773,7 @@ int splash_screen_prepare(void)
 	extern unsigned int uib_logo_image_size;
 
 	s = getenv("splashimage");
+	printf("Ambika: splash_screen_prepare UIB\n");	
 
 	if (s != NULL) {
 		addr = simple_strtoul(s, NULL, 16);
@@ -782,6 +784,27 @@ int splash_screen_prepare(void)
 	}
 	return 0;
 }
+
+int splash_screen_prepare_fastboot(void)
+{
+        char *s;
+        ulong addr;
+        extern unsigned char logobmp_fastboot[];
+        extern unsigned int logobmp_fastboot_size;
+
+        s = getenv("splashimage");
+        printf("Ambika: splash_screen_prepare UIB\n");
+
+        if (s != NULL) {
+                addr = simple_strtoul(s, NULL, 16);
+
+                memcpy((char *)addr, (char *)logobmp_fastboot,
+                                logobmp_fastboot_size);
+                return 1;
+        }
+        return 0;
+}
+
 #endif // CONFIG_MXC_EPDC
 
 #if defined(CONFIG_VIDEO_IPUV3)
@@ -835,7 +858,7 @@ static struct display_info_t const displays[] = {
 {
         .bus    = -1,
         .addr   = 0,
-        .pixfmt = IPU_PIX_FMT_RGB666,
+        .pixfmt = IPU_PIX_FMT_RGB24,
         .detect = NULL,
         .enable = enable_lvds,
         .mode   = {
@@ -1054,6 +1077,14 @@ int board_init(void)
 	//gpio_direction_output(EXT_LED3, 0);
 	gpio_direction_output(EXT_LED0, 0);
 
+	/* PWM backlight */
+        imx_iomux_v3_setup_pad(MX6_PAD_GPIO_9__GPIO1_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL));
+        gpio_direction_output(LVDS0_LED_BL, 1);
+
+        /* LVDS enable */
+        imx_iomux_v3_setup_pad(MX6_PAD_GPIO_17__GPIO7_IO12 | MUX_PAD_CTRL(NO_PAD_CTRL));
+        gpio_direction_output(LVDS0_LED_EN, 1);
+
 	/* setup lcd */
 	imx_iomux_v3_setup_pad(MX6_PAD_EIM_D20__GPIO3_IO20 | MUX_PAD_CTRL(NO_PAD_CTRL));
 	imx_iomux_v3_setup_pad(MX6_PAD_EIM_D25__GPIO3_IO25 | MUX_PAD_CTRL(NO_PAD_CTRL));
@@ -1061,9 +1092,9 @@ int board_init(void)
 	gpio_direction_output(LCD_PWR_EN, 1);
 	gpio_direction_output(LCD_STBYB, 1);
 	/* toggle LCD RESET line */
-	/*gpio_direction_output(LCD_RESET, 0);
+	gpio_direction_output(LCD_RESET, 0);
 	udelay(1000);
-	gpio_set_value(LCD_RESET, 1);*/
+	gpio_set_value(LCD_RESET, 1);
 
 	/* Ambika Copied  from latest Uboot for kitkat **/
 
@@ -1093,14 +1124,6 @@ int board_init(void)
 
 
 	/* Ambika Copied  from latest Uboot for kitkat **/
-
-	/* PWM backlight */
-	imx_iomux_v3_setup_pad(MX6_PAD_GPIO_9__GPIO1_IO09 | MUX_PAD_CTRL(NO_PAD_CTRL));
-	gpio_direction_output(LVDS0_LED_BL, 1);
-
-	/* LVDS enable */
-	imx_iomux_v3_setup_pad(MX6_PAD_GPIO_17__GPIO7_IO12 | MUX_PAD_CTRL(NO_PAD_CTRL));
-	gpio_direction_output(LVDS0_LED_EN, 1);
 
 	/* clear recovery boot latch */
 	imx_iomux_v3_setup_pad(MX6_PAD_EIM_D16__GPIO3_IO16 | MUX_PAD_CTRL(NO_PAD_CTRL));

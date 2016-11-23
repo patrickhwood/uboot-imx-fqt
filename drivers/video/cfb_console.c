@@ -1984,8 +1984,8 @@ static void plot_logo_or_black(void *screen, int width, int x, int y, int black)
 	free(logo_blue);
 #endif
 }
-
-static void *video_logo(void)
+int splash_screen_prepare_fastboot(void);
+void *video_logo(int fastboot)
 {
 	char info[128];
 	int space, len;
@@ -1998,7 +1998,15 @@ static void *video_logo(void)
 #ifdef CONFIG_SPLASH_SCREEN
 	s = getenv("splashimage");
 	if (s != NULL) {
-		splash_screen_prepare();
+		printf("Ambika:splashimage = %x ", s);
+		if(fastboot)
+		{
+			splash_screen_prepare_fastboot();
+		}
+		else
+		{
+			splash_screen_prepare();
+		}
 		addr = simple_strtoul(s, NULL, 16);
 
 		if (video_display_bitmap(addr,
@@ -2008,6 +2016,7 @@ static void *video_logo(void)
 			return ((void *) (video_fb_address));
 		}
 	}
+	
 #endif /* CONFIG_SPLASH_SCREEN */
 
 	logo_plot(video_fb_address, VIDEO_COLS,
@@ -2239,7 +2248,7 @@ static int video_init(void)
 #ifdef CONFIG_VIDEO_LOGO
 	/* Plot the logo and get start point of console */
 	debug("Video: Drawing the logo ...\n");
-	video_console_address = video_logo();
+	video_console_address = video_logo(0);
 #else
 	video_console_address = video_fb_address;
 #endif

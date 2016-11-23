@@ -53,11 +53,21 @@ void splash_get_pos(int *x, int *y)
 #endif /* CONFIG_SPLASH_SCREEN_ALIGN */
 
 #if defined(CONFIG_SPLASH_SCREEN) && defined(CONFIG_LCD)
-int lcd_splash(ulong addr)
+int lcd_splash(ulong addr, int isfastboot)
 {
 	int x = 0, y = 0, ret;
 
-	ret = splash_screen_prepare();
+	printf("Ambika: lcd_splash called \n");
+
+	if(isfastboot)
+	{
+		ret = splash_screen_prepare();
+	}
+	else
+	{
+		ret = splash_screen_prepare_fastboot();
+	}
+			
 	if (ret)
 		return ret;
 
