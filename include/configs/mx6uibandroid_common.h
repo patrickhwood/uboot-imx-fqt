@@ -57,7 +57,7 @@
 /*  For system.img growing up more than 256MB, more buffer needs
 *   to receive the system.img*/
 #define CONFIG_FASTBOOT_TRANSFER_BUF	0x2c000000
-#define CONFIG_FASTBOOT_TRANSFER_BUF_SIZE 0x19000000 /* 400M byte */
+#define CONFIG_FASTBOOT_TRANSFER_BUF_SIZE 0x20000000 /* 512M byte */
 
 #define CONFIG_ANDROID_MAIN_MMC_BUS 2
 #define CONFIG_ANDROID_BOOT_PARTITION_MMC 1
@@ -92,7 +92,7 @@
 		"video=mxcfb0:dev=ldb,LDB-WSVGA,bpp=32,if=RGB24 ldb=sin0 "			\
 		"video=mxcfb1:off video=mxcfb2:off " CONFIG_SYS_NOSMP " "			\
 		"log_buf_len=64K vmalloc=400M androidboot.console=ttymxc0 "			\
-		"androidboot.hardware=freescale androidboot.selinux=permissive androidboot.serialno=0a01234567890abc logo.nologo\0" \
+		"androidboot.hardware=freescale androidboot.selinux=permissive androidboot.dm_verity=disabled androidboot.serialno=0a01234567890abc logo.nologo\0" \
 		"bootcmd_sd=mmc dev 1;"												\
 		"setenv bootargs ${bootargs} androidboot.rootdevice=sd; " 			\
 		"boota mmc1 ${recovery}\0"											\
@@ -113,7 +113,7 @@
 
 
 #define CONFIG_USB_FASTBOOT_BUF_ADDR   CONFIG_SYS_LOAD_ADDR
-#define CONFIG_USB_FASTBOOT_BUF_SIZE   0x19000000
+#define CONFIG_USB_FASTBOOT_BUF_SIZE   0x20000000
 
 #if defined(CONFIG_FASTBOOT_STORAGE_NAND)
 #define ANDROID_FASTBOOT_NAND_PARTS "16m@64m(boot) 16m@80m(recovery) 810m@96m(android_root)ubifs"
