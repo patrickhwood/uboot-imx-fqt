@@ -248,6 +248,8 @@ static int esdhc_setup_data(struct mmc *mmc, struct mmc_data *data)
 	timeout = fls(mmc->clock/4);
 	timeout -= 13;
 
+	timeout++;	// PHW -- increase timeout to fix random emmc DMA write failures
+
 	if (timeout > 14)
 		timeout = 14;
 
